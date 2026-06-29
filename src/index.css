@@ -1145,42 +1145,54 @@ select {
   50%      { background:rgba(0,212,255,.14);box-shadow:inset 0 0 0 1px rgba(0,212,255,.55),inset 0 0 30px rgba(0,212,255,.12); }
 }
 
-/* ── Leader highlight — top team with points (professional gold) ── */
+/* ── Leader highlight — top team with points (premium gold) ──────── */
 .lb-row.leader {
-  background:linear-gradient(90deg, rgba(255,215,0,.12), rgba(255,215,0,.02) 70%);
   overflow:hidden;
-  animation:leaderGlow 2.6s ease-in-out infinite;
+  background:
+    linear-gradient(90deg, rgba(255,196,40,.20) 0%, rgba(255,196,40,.05) 45%, transparent 80%);
+  animation:leaderGlow 2.2s ease-in-out infinite;
 }
+/* animated gold accent edge on the left */
+.lb-row.leader::before {
+  background:linear-gradient(180deg, #ffe27a, #ffb300, #ffe27a) !important;
+  width:3px !important;
+  box-shadow:0 0 10px rgba(255,200,60,.9);
+  animation:leaderBar 1.6s ease-in-out infinite;
+}
+/* sweeping light sheen */
 .lb-row.leader::after {
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(105deg, transparent 35%, rgba(255,223,120,.22) 50%, transparent 65%);
-  background-size:220% 100%;
-  animation:leaderSheen 3.2s ease-in-out infinite;
+  background:linear-gradient(105deg, transparent 30%, rgba(255,235,150,.38) 48%, rgba(255,255,255,.15) 52%, transparent 70%);
+  background-size:240% 100%;
+  animation:leaderSheen 2.6s linear infinite;
 }
-.lb-row.leader .lb-name { color:#ffe9a8; text-shadow:0 0 10px rgba(255,200,60,.35); }
+.lb-row.leader .lb-name {
+  color:#ffe39a;font-weight:700;
+  text-shadow:0 0 12px rgba(255,200,60,.55);
+}
+.lb-row.leader .lb-pts { color:#ffe39a;text-shadow:0 0 10px rgba(255,200,60,.5); }
 @keyframes leaderGlow {
-  0%,100% { box-shadow:inset 0 0 0 1px rgba(255,215,0,.22); }
-  50%      { box-shadow:inset 0 0 0 1px rgba(255,215,0,.5), inset 0 0 24px rgba(255,200,60,.1); }
+  0%,100% { box-shadow:inset 0 0 0 1px rgba(255,200,60,.35), inset 0 0 14px rgba(255,200,60,.06); }
+  50%      { box-shadow:inset 0 0 0 1px rgba(255,210,90,.75), inset 0 0 30px rgba(255,200,60,.2); }
 }
-@keyframes leaderSheen {
-  0%   { background-position:220% 0; }
-  60%,100% { background-position:-60% 0; }
-}
+@keyframes leaderBar { 0%,100%{opacity:.55} 50%{opacity:1} }
+@keyframes leaderSheen { 0%{background-position:240% 0} 100%{background-position:-80% 0} }
 
 /* Podium 1st place leader */
 .podium-slot.leader {
-  animation:podLeaderGlow 2.6s ease-in-out infinite;
   position:relative;overflow:hidden;
+  animation:podLeaderGlow 2.2s ease-in-out infinite;
 }
 .podium-slot.leader::after {
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(115deg, transparent 38%, rgba(255,223,120,.28) 50%, transparent 62%);
-  background-size:240% 100%;
-  animation:leaderSheen 3s ease-in-out infinite;
+  background:linear-gradient(120deg, transparent 35%, rgba(255,235,150,.42) 50%, transparent 65%);
+  background-size:260% 100%;
+  animation:leaderSheen 2.8s linear infinite;
 }
+.podium-slot.leader .podium-name { color:#ffe39a;text-shadow:0 0 10px rgba(255,200,60,.5); }
 @keyframes podLeaderGlow {
-  0%,100% { box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 0 22px rgba(255,200,60,.18); }
-  50%      { box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 0 40px rgba(255,200,60,.4); }
+  0%,100% { box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 0 24px rgba(255,200,60,.25); }
+  50%      { box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 0 46px rgba(255,200,60,.55); }
 }
 .lb-rank  { font-family:'Saira',sans-serif;font-size:14px;font-weight:800;width:20px;flex-shrink:0;text-align:center; }
 .lb-team  { display:flex;align-items:center;gap:7px;flex:1;min-width:0; }
