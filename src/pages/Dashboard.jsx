@@ -1,28 +1,65 @@
 import { useState, useEffect } from 'react'
 import { getTournaments } from '../lib/db'
+import { fetchStorage } from '../lib/sync'
+import { firebaseReady } from '../lib/firebase'
 import TournamentCard from '../components/TournamentCard'
 import CreateDialog   from '../components/CreateDialog'
 import FAB            from '../components/FAB'
 import { ToastStack, useToast } from '../components/Toast'
 
+function fmtBytes(b) {
+  if (b < 1024) return `${b} B`
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
+  if (b < 1024 * 1024 * 1024) return `${(b / 1024 / 1024).toFixed(2)} MB`
+  return `${(b / 1024 / 1024 / 1024).toFixed(2)} GB`
+}
+
+function StorageMeter({ storage }) {
+  if (!storage || !storage.ready) return null
+  const pct = Math.min(100, (storage.used / storage.limit) * 100)
+  const level = pct > 90 ? 'crit' : pct > 70 ? 'warn' : 'ok'
+  return (
+    <div className="storage-meter">
+      <div className="storage-meter__head">
+        <span className="storage-meter__label">Database Storage</span>
+        <span className="storage-meter__val">
+          {fmtBytes(storage.used)} <span className="storage-meter__cap">/ 1 GB</span>
+        </span>
+      </div>
+      <div className="storage-meter__bar">
+        <div className={`storage-meter__fill ${level}`} style={{ width: `${Math.max(pct, 1.5)}%` }} />
+      </div>
+      <span className="storage-meter__pct">{pct < 0.1 ? '<0.1' : pct.toFixed(1)}% used · {fmtBytes(storage.limit - storage.used)} free</span>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [tournaments, setTournaments] = useState([])
   const [dialogOpen,  setDialogOpen]  = useState(false)
+  const [storage,     setStorage]     = useState(null)
   const { toasts, push } = useToast()
+
+  function refreshStorage() {
+    if (firebaseReady) fetchStorage().then(setStorage)
+  }
 
   useEffect(() => {
     getTournaments().then(setTournaments)
+    refreshStorage()
   }, [])
 
   function handleCreated(t) {
     setTournaments(prev => [t, ...prev])
     setDialogOpen(false)
     push(`"${t.name}" created`, 'success')
+    refreshStorage()
   }
 
   function handleDeleted(id) {
     setTournaments(prev => prev.filter(t => t.id !== id))
     push('Tournament deleted', 'info')
+    setTimeout(refreshStorage, 600)   // let the Firebase delete settle
   }
 
   const now = new Date()
@@ -41,8 +78,11 @@ export default function Dashboard() {
 
       <main className="dash-main">
         <div className="dash-header">
-          <h1>Tournaments</h1>
-          <p>{tournaments.length} tournament{tournaments.length !== 1 ? 's' : ''} total</p>
+          <div>
+            <h1>Tournaments</h1>
+            <p>{tournaments.length} tournament{tournaments.length !== 1 ? 's' : ''} total</p>
+          </div>
+          <StorageMeter storage={storage} />
         </div>
 
         <div className="card-grid">

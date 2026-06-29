@@ -42,6 +42,11 @@ export function pushBroadcast(id, b) {
     .catch(e => console.warn('[NOVA] pushBroadcast', e))
 }
 
+// Approx bytes a value occupies in the database (base64 is ASCII, so ≈ chars).
+export function byteSize(v) {
+  try { return new Blob([JSON.stringify(v ?? null)]).size } catch { return 0 }
+}
+
 /* ── Tournament index (lightweight list for cross-device dashboard) ── */
 export function pushIndex(t) {
   if (!firebaseReady || !db || !t?.id) return Promise.resolve()
@@ -53,6 +58,8 @@ export function pushIndex(t) {
     playersPerTeam: t.playersPerTeam || 4,
     date: t.date || '',
     createdAt: t.createdAt || new Date().toISOString(),
+    // running estimate of the storage this tournament uses (meta + matches)
+    bytes: byteSize({ teamData: t.teamData, matchData: t.matchData, logo: t.logo }),
   })).catch(e => console.warn('[NOVA] pushIndex', e))
 }
 
@@ -71,6 +78,15 @@ export async function fetchIndex() {
     const snap = await get(ref(db, 'index'))
     return Object.values(snap.val() || {})
   } catch (e) { console.warn('[NOVA] fetchIndex', e); return [] }
+}
+
+/** Estimated Realtime Database usage from the index (bytes used + 1 GB cap). */
+export async function fetchStorage() {
+  const LIMIT = 1024 * 1024 * 1024 // 1 GB free tier
+  if (!firebaseReady || !db) return { used: 0, limit: LIMIT, ready: false }
+  const list = await fetchIndex()
+  const used = list.reduce((sum, t) => sum + (t.bytes || 0), 0)
+  return { used, limit: LIMIT, ready: true }
 }
 
 /** One-time read of a full tournament (meta + matches) by id. */
