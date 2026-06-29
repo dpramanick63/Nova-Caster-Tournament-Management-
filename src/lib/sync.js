@@ -36,8 +36,44 @@ export function pushBroadcast(id, b) {
     .catch(e => console.warn('[NOVA] pushBroadcast', e))
 }
 
-/** Overlay page subscribes to the whole tournament node (realtime). */
+/* ── Overlay cache (instant load before Firebase responds) ────── */
+const CACHE = 'nova_overlay_'
+export function readOverlayCache(id) {
+  try { return JSON.parse(localStorage.getItem(CACHE + id)) || null } catch { return null }
+}
+function writeOverlayCache(id, data) {
+  try { localStorage.setItem(CACHE + id, JSON.stringify(data)) } catch { /* quota */ }
+}
+
+/**
+ * Subscribe to the overlay data with THREE separate listeners so a score
+ * change only re-downloads the small `matches` node — never the logos in
+ * `meta`. Combines them in memory, caches each update, and calls `cb`.
+ */
 export function subscribeOverlay(id, cb) {
   if (!firebaseReady || !db || !id) { cb(null); return () => {} }
-  return onValue(ref(db, `tournaments/${id}`), snap => cb(snap.val()))
+
+  const combined = readOverlayCache(id) || { meta: null, matches: [], broadcast: null }
+  let ready = false
+  const emit = () => {
+    if (!ready) return
+    writeOverlayCache(id, combined)
+    cb({ ...combined })
+  }
+
+  const subs = []
+  const watch = (leaf) => onValue(ref(db, path(id, leaf)), snap => {
+    combined[leaf] = snap.val()
+    emit()
+  })
+
+  subs.push(watch('meta'))
+  subs.push(watch('matches'))
+  subs.push(watch('broadcast'))
+
+  // First paint from cache immediately; live updates follow.
+  ready = true
+  cb({ ...combined })
+
+  return () => subs.forEach(u => u && u())
 }

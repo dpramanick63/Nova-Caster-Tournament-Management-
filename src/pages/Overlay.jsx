@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { subscribeOverlay } from '../lib/sync'
+import { subscribeOverlay, readOverlayCache } from '../lib/sync'
 import { firebaseReady } from '../lib/firebase'
 import { lbVars } from '../lib/utils'
 import { CurrentLeaderboard, MatchResults, OverallStandings } from '../components/match/LiveLeaderboard'
@@ -16,7 +16,8 @@ export default function Overlay() {
   const { id } = useParams()
   const [params] = useSearchParams()
   const chroma = params.get('chroma') === '1'
-  const [data, setData] = useState(undefined) // undefined=loading, null=missing
+  // Seed from cache so OBS shows the last state instantly on (re)load.
+  const [data, setData] = useState(() => (firebaseReady ? readOverlayCache(id) : undefined))
 
   useEffect(() => subscribeOverlay(id, setData), [id])
 

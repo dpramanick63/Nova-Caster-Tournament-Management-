@@ -209,11 +209,12 @@ export function CurrentLeaderboard({ tournament, matchTeams, matchIndex, map, fr
         </div>
         {rows.map((row) => {
           const isWinner = !row.eliminated && aliveRow.length === 1
+          const isLeader = !isWinner && row.rank === 1 && row.total > 0
           return (
             <div
               key={row.teamIndex}
               data-fk={String(row.teamIndex)}
-              className={`lb-row rank-${row.rank} ${row.eliminated ? 'eliminated' : ''} ${isWinner ? 'winner' : ''}`}
+              className={`lb-row rank-${row.rank} ${row.eliminated ? 'eliminated' : ''} ${isWinner ? 'winner' : ''} ${isLeader ? 'leader' : ''}`}
             >
               <span className="lb-rank" style={{color: rankColor(row.rank)}}>{row.rank}</span>
               <span className="lb-team">
@@ -256,8 +257,9 @@ export function MatchResults({ tournament, matchTeams, matchIndex, map, frame })
         {[1,0,2].map(i => {
           const row = top3[i]
           if (!row) return <div key={i} className="podium-slot" />
+          const isLeader = i === 0 && row.total > 0   // 1st place with points
           return (
-            <div key={i} className={`podium-slot pos-${i+1}`} style={{animationDelay:`${i*120}ms`}}>
+            <div key={i} className={`podium-slot pos-${i+1} ${isLeader ? 'leader' : ''}`} style={{animationDelay:`${i*120}ms`}}>
               <div className="podium-rank" style={{color: rankColor(i+1)}}>{ordinalSymbol(i+1)}</div>
               <div className="podium-logo">
                 <TeamLogo logo={row.info.logo} name={row.info.name} />
@@ -307,7 +309,7 @@ export function OverallStandings({ tournament, frame }) {
           <span style={{width:38,textAlign:'right'}}>TOT</span>
         </div>
         {rows.map(row => (
-          <div key={row.teamIndex} data-fk={String(row.teamIndex)} className={`lb-row rank-${row.rank}`}>
+          <div key={row.teamIndex} data-fk={String(row.teamIndex)} className={`lb-row rank-${row.rank} ${row.rank === 1 && row.total > 0 ? 'leader' : ''}`}>
             <span className="lb-rank" style={{color: rankColor(row.rank)}}>{row.rank}</span>
             <span className="lb-team">
               <TeamLogo logo={row.info.logo} name={row.info.name} />

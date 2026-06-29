@@ -51,16 +51,20 @@ export default function MatchTab({ tournament, matchIndex, matchData, onUpdate }
   }
 
   // Push "what to show" to Firebase so the OBS overlay URL stays in sync.
+  // Debounced so dragging the size/resize doesn't spam the database.
   useEffect(() => {
-    pushBroadcast(tournament.id, {
-      matchIndex,
-      view: ms.overlayView || 'current',
-      screenColor: ms.overlayColor || '#00b140',
-      scale: lbScale,
-      style: lbStyle,
-      w: lbW,
-      h: lbH,
-    })
+    const t = setTimeout(() => {
+      pushBroadcast(tournament.id, {
+        matchIndex,
+        view: ms.overlayView || 'current',
+        screenColor: ms.overlayColor || '#00b140',
+        scale: lbScale,
+        style: lbStyle,
+        w: lbW,
+        h: lbH,
+      })
+    }, 200)
+    return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tournament.id, matchIndex, ms.overlayView, ms.overlayColor, lbScale,
       lbStyle.blur, lbStyle.opacity, lbStyle.darkness, lbW, lbH])
