@@ -1,16 +1,12 @@
 // ────────────────────────────────────────────────────────────────
 // Firebase Realtime Database — powers the live OBS overlay URL.
 //
-// HOW TO SET UP (one time, ~3 min):
-//  1. Go to https://console.firebase.google.com  → "Add project" (any name).
-//  2. In the project: build → "Realtime Database" → "Create Database"
-//       → pick a location → start in "Test mode".
-//  3. Project settings (gear icon) → "Your apps" → Web (</>) → register app.
-//  4. Copy the firebaseConfig values it shows into the object below.
-//       Make sure "databaseURL" is included (it looks like
-//       https://<project>-default-rtdb.<region>.firebasedatabase.app).
+// Credentials come from environment variables (NOT hardcoded):
+//   • Local dev  → put them in a .env.local file (see .env.example)
+//   • Vercel     → Project → Settings → Environment Variables
 //
-// The app still works fully offline (localStorage) without this —
+// Vite only exposes vars prefixed with VITE_ to the browser.
+// The app runs fully on localStorage even if these are unset —
 // Firebase only adds the shareable live overlay URL for OBS.
 // ────────────────────────────────────────────────────────────────
 
@@ -18,17 +14,16 @@ import { initializeApp } from 'firebase/app'
 import { getDatabase } from 'firebase/database'
 
 const firebaseConfig = {
-  apiKey:            'YOUR_API_KEY',
-  authDomain:        'YOUR_PROJECT.firebaseapp.com',
-  databaseURL:       'https://YOUR_PROJECT-default-rtdb.firebaseio.com',
-  projectId:         'YOUR_PROJECT',
-  storageBucket:     'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId:             'YOUR_APP_ID',
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL:       import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-export const firebaseReady =
-  !!firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes('YOUR_')
+export const firebaseReady = !!firebaseConfig.databaseURL
 
 let db = null
 if (firebaseReady) {
@@ -39,7 +34,7 @@ if (firebaseReady) {
     console.warn('[NOVA] Firebase init failed:', e)
   }
 } else {
-  console.info('[NOVA] Firebase not configured — running localStorage-only (no live overlay URL).')
+  console.info('[NOVA] Firebase env vars not set — running localStorage-only (no live overlay URL).')
 }
 
 export { db }

@@ -7,6 +7,10 @@ dist/
 # local assistant data
 .claude/
 
+# editor local history
+.history/
+.vscode/
+
 # duplicate of public/303971_trimmed.mp4 (root copy is unused)
 /303971_trimmed.mp4
 
@@ -14,5 +18,6 @@ dist/
 *.log
 .env
 .env.*
+!.env.example
 .DS_Store
 Thumbs.db
