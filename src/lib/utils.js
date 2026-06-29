@@ -32,14 +32,9 @@ export function lbVars(style = {}) {
   const d = style.darkness ?? 1
   const lo = [44, 52, 88], hi = [8, 11, 28] // light → dark navy
   const ch = i => Math.round(lo[i] + (hi[i] - lo[i]) * d)
-  const blur = style.blur ?? 0
-  // "Blur" can't blur OBS video below a browser source, so it instead adds a
-  // dark frost behind the glass — keeps text readable over busy gameplay.
-  const frost = Math.min(0.6, (blur / 20) * 0.6)
   return {
     '--lb-rgb': `${ch(0)}, ${ch(1)}, ${ch(2)}`,
     '--lb-alpha': String(style.opacity ?? 1),
-    '--lb-blur': `${blur}px`,
-    '--lb-frost': frost.toFixed(3),
+    '--lb-blur': `${style.blur ?? 0}px`,
   }
 }
