@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getTournament, updateTournament, deleteTournament } from '../lib/db'
+import { getTournament, updateTournament, deleteTournament, upsertLocal } from '../lib/db'
 import MatchSettings from '../components/match/MatchSettings'
 import MatchTab      from '../components/match/MatchTab'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { ToastStack, useToast } from '../components/Toast'
-import { pushMeta, pushMatches } from '../lib/sync'
+import { pushMeta, pushMatches, pushIndex, fetchTournament } from '../lib/sync'
 
 export default function TournamentDetail() {
   const { id }      = useParams()
@@ -16,13 +16,19 @@ export default function TournamentDetail() {
   const [activeTab, setActive] = useState(0)
 
   useEffect(() => {
-    getTournament(id).then(t => {
+    (async () => {
+      let t = await getTournament(id)
+      if (!t) {
+        // Not on this device — pull it from Firebase (made on another computer)
+        t = await fetchTournament(id)
+        if (t) upsertLocal(t)   // cache locally so edits persist on this device
+      }
       if (!t) { navigate('/dashboard'); return }
       setTourn(t)
       // seed the live overlay with current data
       pushMeta(id, t)
       pushMatches(id, t.matchData || [])
-    })
+    })()
   }, [id])
 
   async function handleSettingsSaved(patch, msg) {
@@ -30,6 +36,7 @@ export default function TournamentDetail() {
     setTourn(updated)
     pushMeta(id, updated)
     pushMatches(id, updated.matchData || [])
+    pushIndex(updated)
     if (msg) push(msg, 'success')
   }
 

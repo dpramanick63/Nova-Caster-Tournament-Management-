@@ -2,7 +2,7 @@
 // No-ops gracefully when Firebase isn't configured.
 
 import { db, firebaseReady } from './firebase'
-import { ref, set, onValue } from 'firebase/database'
+import { ref, set, onValue, get } from 'firebase/database'
 
 // Firebase rejects `undefined`; round-trip strips it (undefined -> dropped).
 const clean = (v) => JSON.parse(JSON.stringify(v ?? null))
@@ -15,10 +15,16 @@ export function pushMeta(id, t) {
   return set(ref(db, path(id, 'meta')), clean({
     name: t.name || 'Tournament',
     logo: t.logo || null,
+    teams: t.teams || 0,
     teamData: t.teamData || [],
     positionPoints: t.positionPoints || [],
     killPoints: t.killPoints || 1,
     playersPerTeam: t.playersPerTeam || 4,
+    playerType: t.playerType || 'squad',
+    numMatches: t.numMatches || 0,
+    maps: t.maps || [],
+    date: t.date || '',
+    settingsSaved: !!t.settingsSaved,
   })).catch(e => console.warn('[NOVA] pushMeta', e))
 }
 
@@ -34,6 +40,56 @@ export function pushBroadcast(id, b) {
   if (!firebaseReady || !db || !id) return Promise.resolve()
   return set(ref(db, path(id, 'broadcast')), clean(b))
     .catch(e => console.warn('[NOVA] pushBroadcast', e))
+}
+
+/* ── Tournament index (lightweight list for cross-device dashboard) ── */
+export function pushIndex(t) {
+  if (!firebaseReady || !db || !t?.id) return Promise.resolve()
+  return set(ref(db, `index/${t.id}`), clean({
+    id: t.id,
+    name: t.name || 'Tournament',
+    teams: t.teams || 0,
+    playerType: t.playerType || 'squad',
+    playersPerTeam: t.playersPerTeam || 4,
+    date: t.date || '',
+    createdAt: t.createdAt || new Date().toISOString(),
+  })).catch(e => console.warn('[NOVA] pushIndex', e))
+}
+
+export function removeRemote(id) {
+  if (!firebaseReady || !db || !id) return Promise.resolve()
+  return Promise.all([
+    set(ref(db, `index/${id}`), null),
+    set(ref(db, `tournaments/${id}`), null),
+  ]).catch(e => console.warn('[NOVA] removeRemote', e))
+}
+
+/** One-time read of the index → array of lightweight tournament stubs. */
+export async function fetchIndex() {
+  if (!firebaseReady || !db) return []
+  try {
+    const snap = await get(ref(db, 'index'))
+    return Object.values(snap.val() || {})
+  } catch (e) { console.warn('[NOVA] fetchIndex', e); return [] }
+}
+
+/** One-time read of a full tournament (meta + matches) by id. */
+export async function fetchTournament(id) {
+  if (!firebaseReady || !db || !id) return null
+  try {
+    const snap = await get(ref(db, `tournaments/${id}`))
+    const v = snap.val()
+    if (!v || !v.meta) return null
+    const matches = v.matches || []
+    return {
+      id,
+      ...v.meta,
+      matchData: matches,
+      numMatches: v.meta.numMatches || matches.length || 0,
+      maps: v.meta.maps || [],
+      settingsSaved: v.meta.settingsSaved || matches.length > 0,
+    }
+  } catch (e) { console.warn('[NOVA] fetchTournament', e); return null }
 }
 
 /* ── Overlay cache (instant load before Firebase responds) ────── */
