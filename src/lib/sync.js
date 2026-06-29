@@ -80,6 +80,12 @@ export async function fetchIndex() {
   } catch (e) { console.warn('[NOVA] fetchIndex', e); return [] }
 }
 
+/** Realtime subscription to the index — fires on every create/delete, any device. */
+export function subscribeIndex(cb) {
+  if (!firebaseReady || !db) { cb([]); return () => {} }
+  return onValue(ref(db, 'index'), snap => cb(Object.values(snap.val() || {})))
+}
+
 /** Estimated Realtime Database usage from the index (bytes used + 1 GB cap). */
 export async function fetchStorage() {
   const LIMIT = 1024 * 1024 * 1024 // 1 GB free tier

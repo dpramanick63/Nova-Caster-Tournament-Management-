@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getTournaments } from '../lib/db'
+import { getTournaments, subscribeTournaments } from '../lib/db'
 import { fetchStorage } from '../lib/sync'
 import { firebaseReady } from '../lib/firebase'
 import TournamentCard from '../components/TournamentCard'
@@ -45,8 +45,14 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    getTournaments().then(setTournaments)
+    getTournaments().then(setTournaments)   // fast first paint
     refreshStorage()
+    // live updates: creates/deletes from any device reflect instantly
+    const unsub = subscribeTournaments(list => {
+      setTournaments(list)
+      refreshStorage()
+    })
+    return unsub
   }, [])
 
   function handleCreated(t) {
