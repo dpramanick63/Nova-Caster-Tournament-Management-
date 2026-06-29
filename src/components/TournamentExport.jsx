@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { exportTournamentPDF, exportTournamentXLSX } from '../lib/exporters'
 
 export default function TournamentExport({ tournament, className = '', label = 'Download', menuUp = false }) {
   const [open, setOpen] = useState(false)
@@ -10,12 +9,15 @@ export default function TournamentExport({ tournament, className = '', label = '
   async function pdf(e) {
     e.stopPropagation()
     setBusy(true)
-    try { await exportTournamentPDF(tournament) }
-    finally { setBusy(false); setOpen(false) }
+    try {
+      const { exportTournamentPDF } = await import('../lib/exporters')
+      await exportTournamentPDF(tournament)
+    } finally { setBusy(false); setOpen(false) }
   }
 
-  function xls(e) {
+  async function xls(e) {
     e.stopPropagation()
+    const { exportTournamentXLSX } = await import('../lib/exporters')
     exportTournamentXLSX(tournament)
     setOpen(false)
   }

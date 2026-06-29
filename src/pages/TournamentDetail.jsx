@@ -16,19 +16,19 @@ export default function TournamentDetail() {
   const [activeTab, setActive] = useState(0)
 
   useEffect(() => {
-    (async () => {
-      let t = await getTournament(id)
-      if (!t) {
-        // Not on this device — pull it from Firebase (made on another computer)
-        t = await fetchTournament(id)
-        if (t) upsertLocal(t)   // cache locally so edits persist on this device
-      }
+    let alive = true
+    ;(async () => {
+      // Firebase is the source of truth — load the freshest copy first so we
+      // never overwrite newer data from another computer with a stale cache.
+      let t = await fetchTournament(id)
+      if (t) upsertLocal(t)
+      else t = await getTournament(id)   // offline / not in cloud → local cache
+      if (!alive) return
       if (!t) { navigate('/dashboard'); return }
       setTourn(t)
-      // seed the live overlay with current data
-      pushMeta(id, t)
-      pushMatches(id, t.matchData || [])
+      pushMeta(id, t)   // ensure the overlay has logos/teams (safe, rarely changes)
     })()
+    return () => { alive = false }
   }, [id])
 
   async function handleSettingsSaved(patch, msg) {

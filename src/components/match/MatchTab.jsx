@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { CurrentLeaderboard, MatchResults, OverallStandings } from './LiveLeaderboard'
 import ConfirmDialog from '../ConfirmDialog'
-import { exportMatchPDF, exportMatchXLSX } from '../../lib/exporters'
 import { lbVars } from '../../lib/utils'
 import { pushBroadcast } from '../../lib/sync'
 
@@ -113,8 +112,16 @@ export default function MatchTab({ tournament, matchIndex, matchData, onUpdate }
   const hasData    = ms.teams.some(t => t.kills > 0 || t.eliminated)
   const matchEnded = !ms.isLive && (ms.isEnded || hasData)
 
-  async function downloadPDF()  { await exportMatchPDF(tournament, ms, matchIndex); setShowExport(false) }
-  function downloadXLSX()       { exportMatchXLSX(tournament, ms, matchIndex);       setShowExport(false) }
+  async function downloadPDF() {
+    const { exportMatchPDF } = await import('../../lib/exporters')
+    await exportMatchPDF(tournament, ms, matchIndex)
+    setShowExport(false)
+  }
+  async function downloadXLSX() {
+    const { exportMatchXLSX } = await import('../../lib/exporters')
+    exportMatchXLSX(tournament, ms, matchIndex)
+    setShowExport(false)
+  }
 
   const [copied, setCopied] = useState(false)
   function copyOverlayUrl() {
