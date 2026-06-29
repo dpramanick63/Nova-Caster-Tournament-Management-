@@ -1080,7 +1080,9 @@ select {
 /* Header strip — sharp angular (user-controllable glass bg) */
 .lb-head {
   display:flex;align-items:center;gap:10px;padding:9px 13px;
-  background:rgba(var(--lb-rgb, 11,15,32), var(--lb-alpha, 1));
+  background:
+    linear-gradient(rgba(0,0,0,var(--lb-frost,0)), rgba(0,0,0,var(--lb-frost,0))),
+    rgba(var(--lb-rgb, 11,15,32), var(--lb-alpha, 1));
   backdrop-filter:blur(var(--lb-blur, 0px));
   border:1px solid rgba(0,212,255,.25);
   border-bottom:2px solid var(--c1);
@@ -1088,8 +1090,8 @@ select {
   box-shadow:0 0 0 1px rgba(0,0,0,.5);
 }
 .lb-head-info { display:flex;flex-direction:column;flex:1;min-width:0;border-left:3px solid var(--c1);padding-left:11px; }
-.lb-head-title { font-family:'Saira',sans-serif;font-size:15px;font-weight:700;letter-spacing:.2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.lb-head-sub { font-family:'Saira',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(0,212,255,.9);text-transform:uppercase;margin-top:2px; }
+.lb-head-title { font-family:'Saira',sans-serif;font-size:15px;font-weight:700;letter-spacing:.2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.95); }
+.lb-head-sub { font-family:'Saira',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(120,230,255,1);text-transform:uppercase;margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,.95); }
 .lb-head-live {
   font-family:'Saira',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;
   padding:4px 10px;border-radius:3px;flex-shrink:0;
@@ -1106,15 +1108,20 @@ select {
 .lb-col-bar {
   display:flex;align-items:center;padding:5px 13px;gap:7px;
   position:sticky;top:0;z-index:2;
-  background:rgba(var(--lb-rgb, 10,14,31), var(--lb-alpha, 1));
+  background:
+    linear-gradient(rgba(0,0,0,var(--lb-frost,0)), rgba(0,0,0,var(--lb-frost,0))),
+    rgba(var(--lb-rgb, 10,14,31), var(--lb-alpha, 1));
   backdrop-filter:blur(var(--lb-blur, 0px));
-  font-family:'Saira',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);
+  font-family:'Saira',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.7);
+  text-shadow:0 1px 2px rgba(0,0,0,.9);
   border-left:1px solid rgba(0,212,255,.18);border-right:1px solid rgba(0,212,255,.18);
 }
 
 /* Body — sharp angular (user-controllable glass bg) */
 .lb-table {
-  background:rgba(var(--lb-rgb, 11,15,32), var(--lb-alpha, 1));
+  background:
+    linear-gradient(rgba(0,0,0,var(--lb-frost,0)), rgba(0,0,0,var(--lb-frost,0))),
+    rgba(var(--lb-rgb, 11,15,32), var(--lb-alpha, 1));
   backdrop-filter:blur(var(--lb-blur, 0px));
   border:1px solid rgba(0,212,255,.18);border-top:none;
   clip-path:polygon(0 0,100% 0,100% calc(100% - 11px),calc(100% - 11px) 100%,0 100%);
@@ -1138,7 +1145,7 @@ select {
 .lb-row.rank-1::before { background:linear-gradient(180deg,#FFD700,transparent); }
 .lb-row.rank-2::before { background:linear-gradient(180deg,#C0C0C0,transparent); }
 .lb-row.rank-3::before { background:linear-gradient(180deg,#CD7F32,transparent); }
-.lb-row.eliminated { filter:grayscale(1);opacity:.45; }
+.lb-row.eliminated { opacity:.92; }
 .lb-row.winner { animation:winGlow 1.6s ease-in-out infinite; }
 @keyframes winGlow {
   0%,100% { background:rgba(0,212,255,.05);box-shadow:inset 0 0 0 1px rgba(0,212,255,.18); }
@@ -1168,9 +1175,9 @@ select {
 }
 .lb-row.leader .lb-name {
   color:#ffe39a;font-weight:700;
-  text-shadow:0 0 12px rgba(255,200,60,.55);
+  text-shadow:0 1px 3px rgba(0,0,0,.95), 0 0 12px rgba(255,200,60,.55);
 }
-.lb-row.leader .lb-pts { color:#ffe39a;text-shadow:0 0 10px rgba(255,200,60,.5); }
+.lb-row.leader .lb-pts { color:#ffe39a;text-shadow:0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(255,200,60,.5); }
 @keyframes leaderGlow {
   0%,100% { box-shadow:inset 0 0 0 1px rgba(255,200,60,.35), inset 0 0 14px rgba(255,200,60,.06); }
   50%      { box-shadow:inset 0 0 0 1px rgba(255,210,90,.75), inset 0 0 30px rgba(255,200,60,.2); }
@@ -1194,11 +1201,11 @@ select {
   0%,100% { box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 0 24px rgba(255,200,60,.25); }
   50%      { box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 0 46px rgba(255,200,60,.55); }
 }
-.lb-rank  { font-family:'Saira',sans-serif;font-size:14px;font-weight:800;width:20px;flex-shrink:0;text-align:center; }
+.lb-rank  { font-family:'Saira',sans-serif;font-size:14px;font-weight:800;width:20px;flex-shrink:0;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.7); }
 .lb-team  { display:flex;align-items:center;gap:7px;flex:1;min-width:0; }
-.lb-logo  { width:21px;height:21px;border-radius:4px;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,.12); }
-.lb-logo-ph { width:21px;height:21px;border-radius:4px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:7px;font-weight:700;color:rgba(255,255,255,.3);flex-shrink:0; }
-.lb-name  { font-family:'Saira',sans-serif;font-size:13px;font-weight:600;color:#fff;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.lb-logo  { width:21px;height:21px;border-radius:4px;object-fit:cover;flex-shrink:0;border:1px solid rgba(255,255,255,.22);box-shadow:0 1px 4px rgba(0,0,0,.5); }
+.lb-logo-ph { width:21px;height:21px;border-radius:4px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:7px;font-weight:700;color:rgba(255,255,255,.55);flex-shrink:0; }
+.lb-name  { font-family:'Saira',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.6); }
 /* alive bars in broadcast table */
 .lb-bars { display:flex;align-items:center;justify-content:center;gap:2px;width:44px;flex-shrink:0; }
 .lb-bar {
@@ -1206,10 +1213,16 @@ select {
   background:#10e070;box-shadow:0 0 5px rgba(16,224,112,.6);
   border-top:1px solid rgba(255,255,255,.25);
 }
-.lb-bar.down { background:rgba(255,255,255,.12);box-shadow:none;border-color:transparent; }
-.lb-elim { font-family:'Saira',sans-serif;font-size:11px;font-weight:800;color:#f87171; }
-.lb-kills { font-family:'Saira',sans-serif;font-size:12px;font-weight:700;color:var(--warn);width:30px;text-align:center;flex-shrink:0; }
-.lb-pts   { font-family:'Saira',sans-serif;font-size:14px;font-weight:800;color:#fff;width:38px;text-align:right;flex-shrink:0; }
+.lb-bar.down { background:rgba(255,255,255,.18);box-shadow:none;border-color:transparent; }
+.lb-elim { font-family:'Saira',sans-serif;font-size:11px;font-weight:800;color:#ff8a8a;text-shadow:0 1px 3px rgba(0,0,0,.95); }
+.lb-kills { font-family:'Saira',sans-serif;font-size:12px;font-weight:800;color:#ffd84d;width:30px;text-align:center;flex-shrink:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.7); }
+.lb-pts   { font-family:'Saira',sans-serif;font-size:14px;font-weight:800;color:#fff;width:38px;text-align:right;flex-shrink:0;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.7); }
+
+/* Eliminated teams — clearly visible (white, lightly dimmed), not greyed out */
+.lb-row.eliminated { opacity:.92; }
+.lb-row.eliminated .lb-logo, .lb-row.eliminated .lb-logo-ph { filter:grayscale(.6);opacity:.8; }
+.lb-row.eliminated .lb-name { color:rgba(255,255,255,.92); }
+.lb-row.eliminated .lb-rank { color:rgba(255,255,255,.7) !important; }
 
 /* Podium — extra compact so the full results fit on one screen */
 .lb-results { gap:7px; }
@@ -1219,14 +1232,19 @@ select {
 }
 .podium {
   display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:9px 8px;
-  background:rgba(var(--lb-rgb, 10,14,31), var(--lb-alpha, 1));backdrop-filter:blur(var(--lb-blur, 0px));
+  background:
+    linear-gradient(rgba(0,0,0,var(--lb-frost,0)), rgba(0,0,0,var(--lb-frost,0))),
+    rgba(var(--lb-rgb, 10,14,31), var(--lb-alpha, 1));
+  backdrop-filter:blur(var(--lb-blur, 0px));
   border:1px solid rgba(0,212,255,.15);
   box-shadow:0 18px 40px rgba(0,0,0,.4);
 }
 .podium-slot {
   display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 9px;
   border:1px solid rgba(255,255,255,.08);
-  background:rgba(var(--lb-rgb, 13,17,36), calc(var(--lb-alpha, 1) * 0.88));
+  background:
+    linear-gradient(rgba(0,0,0,var(--lb-frost,0)), rgba(0,0,0,var(--lb-frost,0))),
+    rgba(var(--lb-rgb, 13,17,36), calc(var(--lb-alpha, 1) * 0.92));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 5px 14px rgba(0,0,0,.28);
   min-width:66px;animation:podRise .45s var(--ease) both;
 }
@@ -1234,11 +1252,11 @@ select {
 .podium-slot.pos-1 { background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.3);padding:8px 10px;min-width:80px;box-shadow:0 0 22px rgba(255,215,0,.12); }
 .podium-slot.pos-2 { background:rgba(192,192,192,.05);border-color:rgba(192,192,192,.2); }
 .podium-slot.pos-3 { background:rgba(205,127,50,.05);border-color:rgba(205,127,50,.2); }
-.podium-rank { font-family:'Saira',sans-serif;font-size:10px;font-weight:800;letter-spacing:1px; }
+.podium-rank { font-family:'Saira',sans-serif;font-size:10px;font-weight:800;letter-spacing:1px;text-shadow:0 1px 3px rgba(0,0,0,.95); }
 .podium-logo { width:30px;height:30px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center; }
 .podium-logo img { width:100%;height:100%;object-fit:cover; }
-.podium-name { font-family:'Saira',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2px;color:#fff;text-align:center;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.podium-pts  { font-family:'Saira',sans-serif;font-size:.85rem;font-weight:800;color:#fff; }
+.podium-name { font-family:'Saira',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2px;color:#fff;text-align:center;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.95); }
+.podium-pts  { font-family:'Saira',sans-serif;font-size:.85rem;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.95); }
 .podium-slot.pos-1 .podium-logo { width:38px;height:38px; }
 .podium-slot.pos-1 .podium-pts { font-size:1rem; }
 

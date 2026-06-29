@@ -97,7 +97,7 @@ function rankColor(r) {
   if (r === 1) return '#FFD700'
   if (r === 2) return '#C0C0C0'
   if (r === 3) return '#CD7F32'
-  return 'var(--tx3)'
+  return 'rgba(255,255,255,.92)'
 }
 
 function TeamLogo({ logo, name }) {

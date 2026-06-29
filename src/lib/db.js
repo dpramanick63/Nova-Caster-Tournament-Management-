@@ -1,7 +1,7 @@
 // Data layer — localStorage is the fast local cache; Firebase mirrors it
 // so tournaments are reachable from any device.
 
-import { pushIndex, pushMeta, removeRemote, fetchIndex } from './sync'
+import { pushIndex, pushMeta, pushMatches, removeRemote, fetchIndex } from './sync'
 
 const KEY = 'nova_tournaments'
 
@@ -17,9 +17,22 @@ function write(data) {
 // Fields that belong in the lightweight cross-device index.
 const INDEX_FIELDS = ['name', 'teams', 'date', 'playerType', 'playersPerTeam']
 
+let _mirrored = false
+/** Push every local tournament up to Firebase so other devices can see/open it. */
+function mirrorLocalToCloud(local) {
+  if (_mirrored) return
+  _mirrored = true
+  for (const t of local) {
+    pushIndex(t)
+    pushMeta(t.id, t)
+    pushMatches(t.id, t.matchData || [])
+  }
+}
+
 /** Dashboard list = local tournaments + any remote-only ones (other devices). */
 export async function getTournaments() {
-  const local    = read()
+  const local = read()
+  mirrorLocalToCloud(local)   // make this device's tournaments visible everywhere
   const localIds = new Set(local.map(t => t.id))
   const remote   = await fetchIndex()
   const stubs    = remote.filter(r => r && r.id && !localIds.has(r.id))
